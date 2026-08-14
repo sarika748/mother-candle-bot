@@ -1,0 +1,32 @@
+name: Mother Candle Bot
+
+on:
+  schedule:
+    # Runs every 5 minutes. GitHub Actions' scheduler is best-effort and can
+    # occasionally lag by a few minutes during high load -- this is normal
+    # and not something you can fully control on the free tier.
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}   # lets you manually trigger a run from the GitHub UI, useful for testing
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot check
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python mother_candle_bot_github.py
+        
